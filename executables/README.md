@@ -1,3 +1,10 @@
+# Command-line executables
+
+will take a png representing a cell pattern (non-black=live cell) run a number of ticks, and save result.
+
+note: a glider, or other such, will cause the creation of a very large png file after a large number of ticks, since here the origin is always in the png file.
+
+
 |  sys/arch     |   file suffix      |           details                                                                         |    notes       |
 |---------------|--------------------|-------------------------------------------------------------------------------------------|----------------|
 | linux/amd64   | [SYSV64].elf       | ELF 64-bit LSB executable: x86-64: version 1 (SYSV): statically linked: not stripped      |                |
