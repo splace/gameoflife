@@ -44,10 +44,12 @@ func main() {
 	
     if source.File==nil {
     	var err error
+	    log.Printf("Loading:<<StdIn>>")
 		liveCells,err=DecodeCellsFromImages(os.Stdin)
 		if 	err!=nil{panic(err)}
 	}else{
     	var err error
+	    log.Printf("Loading:%q",&source)
 		liveCells,err=DecodeCellsFromImages(source)
 		if 	err!=nil{panic(err)}
 	}	
@@ -64,8 +66,8 @@ func main() {
 		if 	err!=nil{panic(err)}
 	}else{
     	var err error
-	    log.Printf("Saving:%v",sink.File)
-		EncodeCellsAsImage(sink, liveCells) 
+	    log.Printf("Saving:%q",sink)
+		EncodeCellsAsImage(&sink, liveCells) 
 		if 	err!=nil{panic(err)}
 	}	
 }
@@ -110,7 +112,4 @@ func atOffset(l loc, dx, dy int8) surroundingLiveCellCounter {
 	return 0
 }
 
-/*  Hal3 Fri 8 Sep 15:25:43 BST 2017 go version go1.6.2 linux/amd64
-Fri 8 Sep 15:26:22 BST 2017
-*/
 

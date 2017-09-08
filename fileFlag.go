@@ -1,7 +1,6 @@
 package main
 
 import "os"
-import "fmt"
 
 type fileValue struct{
     *os.File
@@ -15,7 +14,7 @@ func (fsf *fileValue) Set(v string) error {
 
 func (fsf *fileValue) String() string {
     if fsf==nil || fsf.File==nil {return "<file name>"}
-    return fmt.Sprint(fsf.File)
+    return fsf.File.Name()
 }
 
 
