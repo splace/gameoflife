@@ -4,6 +4,8 @@ import (
 	"os"
 )
 import "flag"
+import "time"
+import "log"
 
 type loc struct{ x, y int }
 
@@ -15,6 +17,8 @@ var deadCellsNextToLiveCell map[loc]surroundingLiveCellCounter
 func main() {
 	var cycles uint
 	flag.UintVar(&cycles, "ticks", 1, "Ticks/Cycles")
+	var logInterval time.Duration
+	flag.DurationVar(&logInterval, "interval", time.Second, "time between log status reports")
 	var help bool
 	flag.BoolVar(&help,"help", false, "display help/usage.")
 	flag.BoolVar(&help,"h", false, "display help/usage.")
@@ -30,6 +34,14 @@ func main() {
 		os.Exit(0)
 	}
 	
+	var c uint
+	doLog := time.NewTicker(logInterval)
+	go func(){
+		for _ = range doLog.C {
+		    log.Printf("\t#%d\talive:%d",c,len(liveCells))
+		}
+	}()
+	
     if source.File==nil {
     	var err error
 		liveCells,err=DecodeCellsFromImages(os.Stdin)
@@ -40,17 +52,19 @@ func main() {
 		if 	err!=nil{panic(err)}
 	}	
 	
-	var t uint
-	for t = 1; t < cycles ; t++ {
+	for c = 1; c < cycles ; c++ {
 		if !tick(){break}
 	}
 	
+	doLog.Stop()
     if sink.File==nil {
     	var err error
+	    log.Printf("Saving:<<StdOut>>")
 		EncodeCellsAsImage(os.Stdout, liveCells) 
 		if 	err!=nil{panic(err)}
 	}else{
     	var err error
+	    log.Printf("Saving:%v",sink.File)
 		EncodeCellsAsImage(sink, liveCells) 
 		if 	err!=nil{panic(err)}
 	}	
@@ -96,4 +110,7 @@ func atOffset(l loc, dx, dy int8) surroundingLiveCellCounter {
 	return 0
 }
 
+/*  Hal3 Fri 8 Sep 15:25:43 BST 2017 go version go1.6.2 linux/amd64
+Fri 8 Sep 15:26:22 BST 2017
+*/
 
