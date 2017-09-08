@@ -14,3 +14,5 @@ note: a glider, or other such, will cause the creation of a very large png file 
 | linux/arm32   | [arm32][-HWFP].elf | ELF 32-bit LSB executable: ARM: EABI5 version 1 (SYSV): statically linked: not stripped   | No H/W F-P     |
 | windows/amd64 | [PE32+].exe        | PE32+ executable (console) x86-64 (stripped to external PDB): for MS Windows              |                |
 | windows/386   | [PE32].exe         | PE32 executable (console) Intel 80386 (stripped to external PDB): for MS Windows          |                |
+| darwin/amd64  | [macho64]          | Mach-O 64-bit x86_64 executable                                                           |                |
+| darwin/386    | [macho32]          | Mach-O i386 executable                                                                    |                |
