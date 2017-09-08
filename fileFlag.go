@@ -13,7 +13,7 @@ func (fsf *fileValue) Set(v string) error {
 }
 
 func (fsf *fileValue) String() string {
-    if fsf==nil || fsf.File==nil {return "<file name>"}
+    if fsf==nil || fsf.File==nil {return "<nil>"}
     return fsf.File.Name()
 }
 
