@@ -19,3 +19,23 @@ note: a glider, or other such, will cause the creation of a very large png file 
 | darwin/386    | [macho32]          | Mach-O i386 executable                                                                    |                |
 
 
+
+Usage
+```
+  -h	display help/usage.
+  -help
+    	display help/usage.
+  -i value
+    	source for the starting cell pattern, encoded in PNG image.(default:<Stdin>)
+  -input value
+    	source for the starting cell pattern, encoded in PNG image.(default:<Stdin>)
+  -interval duration
+    	time between log status reports (default 1s)
+  -o value
+    	file for encoding result cell pattern, PNG image.(default:Stdout)
+  -output value
+    	file for encoding result cell pattern, PNG image.(default:Stdout)
+  -ticks uint
+    	Ticks/Cycles (default 1)
+```
+
