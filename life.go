@@ -49,6 +49,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
+
 	} else {
 		var err error
 		log.Printf("Loading:%q", &source)
@@ -57,19 +58,23 @@ func main() {
 			panic(err)
 		}
 	}
+	log.Printf("\t#%d\talive:%d", 0, len(liveCells))
 
-	for c = 1; c < cycles; c++ {
+	for c = 0; c < cycles; c++ {
 		if !tick() {
+			log.Print("Unchanging")
 			break
 		}
 	}
+
+	log.Printf("\t#%d\talive:%d", c, len(liveCells))
 
 	doLog.Stop()
 	if sink.File == nil {
 		log.Printf("Saving:<<StdOut>>")
 		EncodeCellsAsImage(os.Stdout, liveCells)
 	} else {
-		log.Printf("Saving:%q", sink)
+		log.Printf("Saving:%q", &sink)
 		EncodeCellsAsImage(&sink, liveCells)
 	}
 }

@@ -17,7 +17,8 @@ func DecodeCellsFromImages(r io.Reader)(c map[loc]surroundingLiveCellCounter,err
 	if err!=nil{return}
 	c = make(map[loc]surroundingLiveCellCounter)
 	SetCells(img,&c)
-	// look for any image encodings following on from the same Reader, abort but dont return errors.
+	// look for any image encodings following on from in the same Reader, but dont return any error.
+	// allows easy overlaying several grids
 	var eerr error
 	for {
 		img,_,eerr=image.Decode(r)
@@ -52,6 +53,7 @@ type Depiction struct {
 
 func NewDepictionAll(cs map[loc]surroundingLiveCellCounter, below, above color.Color) Depiction {
 	limits:=image.ZR
+	// find limits
 	for l:=range cs{
 		if l.x>=limits.Max.X {limits.Max.X=l.x+1}
 		if l.x<limits.Min.X {limits.Min.X=l.x}
