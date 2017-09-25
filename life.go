@@ -9,6 +9,7 @@ import "log"
 import "strconv"
 import "path/filepath"
 
+import "github.com/splace/fsflags"
 
 type loc struct{ x, y int }
 
@@ -33,13 +34,13 @@ func main() {
 	var help bool
 	flag.BoolVar(&help, "help", false, "display help/usage.")
 	flag.BoolVar(&help, "h", false, "display help/usage.")
-	var source fileValue
+	var source fsflags.FileValue
 	flag.Var(&source, "i", "source for the starting cell pattern, encoded in PNG image.(default:<Stdin>)")
 	flag.Var(&source, "input", "source for the starting cell pattern, encoded in PNG image.(default:<Stdin>)")
-	var sink createFileValue
+	var sink fsflags.CreateFileValue
 	flag.Var(&sink, "o", "file for encoding result cell pattern, PNG image.(default:Stdout)")
 	flag.Var(&sink, "output", "file for encoding result cell pattern, PNG image.(default:Stdout)")
-	var movie newOverwriteDirValue
+	var movie fsflags.NewOverwriteDirValue
 	flag.Var(&movie, "m", "directory for intermittent result cell pattern, PNG images.")
 	flag.Var(&movie, "movie", "directory for intermittent result cell pattern, PNG images.")
 	flag.Parse()
