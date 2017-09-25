@@ -6,6 +6,9 @@ import (
 import "flag"
 import "time"
 import "log"
+import "strconv"
+import "path/filepath"
+
 
 type loc struct{ x, y int }
 
@@ -14,9 +17,17 @@ type surroundingLiveCellCounter uint8
 var liveCells map[loc]surroundingLiveCellCounter
 var deadCellsNextToLiveCell map[loc]surroundingLiveCellCounter
 
+var size int
+
 func main() {
+	var wrap uint
+	flag.UintVar(&wrap, "w", 4,"arena wraps if set. also makes image output fixed size.")
+	flag.UintVar(&wrap, "wrap",4,"arena wraps if set. also makes image output fixed size.")
 	var cycles uint
 	flag.UintVar(&cycles, "ticks", 1, "Ticks/Cycles")
+	var ticksSnapshot uint
+	flag.UintVar(&ticksSnapshot, "f", 1,"ticks for each snapshot image.")
+	flag.UintVar(&ticksSnapshot, "frameTicks", 1,"ticks for each snapshot image.")
 	var logInterval time.Duration
 	flag.DurationVar(&logInterval, "interval", time.Second, "time between log status reports")
 	var help bool
@@ -25,9 +36,12 @@ func main() {
 	var source fileValue
 	flag.Var(&source, "i", "source for the starting cell pattern, encoded in PNG image.(default:<Stdin>)")
 	flag.Var(&source, "input", "source for the starting cell pattern, encoded in PNG image.(default:<Stdin>)")
-	var sink newFileValue
+	var sink createFileValue
 	flag.Var(&sink, "o", "file for encoding result cell pattern, PNG image.(default:Stdout)")
 	flag.Var(&sink, "output", "file for encoding result cell pattern, PNG image.(default:Stdout)")
+	var movie newOverwriteDirValue
+	flag.Var(&movie, "m", "directory for intermittent result cell pattern, PNG images.")
+	flag.Var(&movie, "movie", "directory for intermittent result cell pattern, PNG images.")
 	flag.Parse()
 	if help {
 		flag.PrintDefaults()
@@ -65,6 +79,16 @@ func main() {
 			log.Print("Unchanging")
 			break
 		}
+		if movie.File!=nil{
+			if c%ticksSnapshot ==0 {
+				frameFile,err:=os.Create(filepath.Join(movie.File.Name(),strconv.FormatUint(uint64(c),10)+".png"))
+				if err!=nil{
+					log.Printf("\t#%d\tUnable to save frame:%s", c,err)
+				}else{
+					EncodeCellsAsSizedImage(frameFile, liveCells,size)				
+				}
+			}
+		}
 	}
 
 	log.Printf("\t#%d\talive:%d", c, len(liveCells))
@@ -73,6 +97,7 @@ func main() {
 	if sink.File == nil {
 		log.Printf("Saving:<<StdOut>>")
 		EncodeCellsAsImage(os.Stdout, liveCells)
+		
 	} else {
 		log.Printf("Saving:%q", &sink)
 		EncodeCellsAsImage(&sink, liveCells)
@@ -107,6 +132,10 @@ func tick() (activity bool) {
 func atOffset(l loc, dx, dy int8) surroundingLiveCellCounter {
 	l.x += int(dx)
 	l.y += int(dy)
+	if size>0 {
+		l.x %=size
+		l.y %=size
+	}
 	if _, in := liveCells[l]; in {
 		return 1
 	}

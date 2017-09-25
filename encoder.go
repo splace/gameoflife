@@ -6,8 +6,7 @@ import (
 	"image/color/palette"
 	"image/png"
 	"io"
-)
-
+	)
 
 var liveColor = color.White
 var emptyColor = color.Black 
@@ -16,20 +15,19 @@ func DecodeCellsFromImages(r io.Reader)(c map[loc]surroundingLiveCellCounter,err
 	img,_,err:=image.Decode(r)
 	if err!=nil{return}
 	c = make(map[loc]surroundingLiveCellCounter)
-	SetCells(img,&c)
-	// look for any image encodings following on from in the same Reader, but dont return any error.
+	SetCells(img,img.Bounds(),&c)
+	// look for any image encodings, following on, in the same Reader, but dont return any error from these.
 	// allows easy overlaying several grids
 	var eerr error
 	for {
 		img,_,eerr=image.Decode(r)
 		if eerr!=nil{return}
-		SetCells(img,&c)
+		SetCells(img,img.Bounds(),&c)
 	}
 	return
 }
 
-func SetCells(i image.Image,cells *map[loc]surroundingLiveCellCounter){
-	ib:=i.Bounds()
+func SetCells(i image.Image,ib image.Rectangle,cells *map[loc]surroundingLiveCellCounter){
 	emptyColor:=i.ColorModel().Convert(emptyColor)
 	for x:=ib.Min.X;x<ib.Max.X;x++{
 		for y:=ib.Min.Y;y<ib.Max.Y;y++{
@@ -41,26 +39,30 @@ func SetCells(i image.Image,cells *map[loc]surroundingLiveCellCounter){
 }
 
 
-func EncodeCellsAsImage(w io.Writer,c map[loc]surroundingLiveCellCounter)(err error){
-	return png.Encode(w, RGBAImage{NewDepictionAll(c, liveColor, emptyColor)}) 
+func EncodeCellsAsImage(w io.Writer,c map[loc]surroundingLiveCellCounter) error{
+	return png.Encode(w, RGBAImage{Depiction{c, CellsBounds(c),liveColor, emptyColor}}) 
 }
 
-type Depiction struct {
-	Cells map[loc]surroundingLiveCellCounter
-	size  image.Rectangle
-	in,out color.Color
+func EncodeCellsAsSizedImage(w io.Writer,c map[loc]surroundingLiveCellCounter,size int) error{
+	return png.Encode(w, RGBAImage{Depiction{c, image.Rect(-size,-size,size-1,size-1),liveColor, emptyColor}}) 
 }
 
-func NewDepictionAll(cs map[loc]surroundingLiveCellCounter, below, above color.Color) Depiction {
+func CellsBounds(c map[loc]surroundingLiveCellCounter)image.Rectangle{
 	limits:=image.ZR
-	// find limits
-	for l:=range cs{
+	for l:=range c{
 		if l.x>=limits.Max.X {limits.Max.X=l.x+1}
 		if l.x<limits.Min.X {limits.Min.X=l.x}
 		if l.y>=limits.Max.Y {limits.Max.Y=l.y+1}
 		if l.y<limits.Min.Y {limits.Min.Y=l.y}
 	}
-	return Depiction{cs,limits, below, above}
+	return limits
+}
+
+
+type Depiction struct {
+	Cells map[loc]surroundingLiveCellCounter
+	size  image.Rectangle
+	in,out color.Color
 }
 
 func (i Depiction) Bounds() image.Rectangle {
@@ -73,9 +75,6 @@ func (i Depiction) At(xp, yp int) color.Color {
 	}
 	return i.out
 }
-
-
-
 
 // a Depictor is an image.Image without a colormodel, so is more general.
 // by being embedded in one of the helper wrappers you get an image.Image.
