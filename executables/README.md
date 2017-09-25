@@ -22,6 +22,10 @@ note: a glider, or other such, will cause the creation of a very large png file 
 
 Usage
 ```
+ -f uint
+    	ticks for each snapshot image. (default 1)
+  -frameTicks uint
+    	ticks for each snapshot image. (default 1)
   -h	display help/usage.
   -help
     	display help/usage.
@@ -31,11 +35,20 @@ Usage
     	source for the starting cell pattern, encoded in PNG image.(default:<Stdin>)
   -interval duration
     	time between log status reports (default 1s)
+  -m value
+    	directory for intermittent result cell pattern, PNG images.
+  -movie value
+    	directory for intermittent result cell pattern, PNG images.
   -o value
     	file for encoding result cell pattern, PNG image.(default:Stdout)
   -output value
     	file for encoding result cell pattern, PNG image.(default:Stdout)
   -ticks uint
     	Ticks/Cycles (default 1)
+  -w uint
+    	arena wraps if set. also makes image output fixed size. (default 4)
+  -wrap uint
+    	arena wraps if set. also makes image output fixed size. (default 4)
+
 ```
 
