@@ -43,8 +43,8 @@ func EncodeCellsAsImage(w io.Writer,c map[loc]surroundingLiveCellCounter) error{
 	return png.Encode(w, RGBAImage{Depiction{c, CellsBounds(c),liveColor, emptyColor}}) 
 }
 
-func EncodeCellsAsSizedImage(w io.Writer,c map[loc]surroundingLiveCellCounter,size int) error{
-	return png.Encode(w, RGBAImage{Depiction{c, image.Rect(-size,-size,size-1,size-1),liveColor, emptyColor}}) 
+func EncodeCellsAsSizedImage(w io.Writer,c map[loc]surroundingLiveCellCounter,size uint) error{
+	return png.Encode(w, RGBAImage{Depiction{c, image.Rect(-int(size/2),-int(size/2),int(size/2),int(size/2)),liveColor, emptyColor}}) 
 }
 
 func CellsBounds(c map[loc]surroundingLiveCellCounter)image.Rectangle{

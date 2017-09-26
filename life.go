@@ -18,31 +18,36 @@ type surroundingLiveCellCounter uint8
 var liveCells map[loc]surroundingLiveCellCounter
 var deadCellsNextToLiveCell map[loc]surroundingLiveCellCounter
 
-var size int
+var limit int
+var wrap bool
 
 func main() {
-	var wrap uint
-	flag.UintVar(&wrap, "w", 4,"arena wraps if set. also makes image output fixed size.")
-	flag.UintVar(&wrap, "wrap",4,"arena wraps if set. also makes image output fixed size.")
-	var cycles uint
-	flag.UintVar(&cycles, "ticks", 1, "Ticks/Cycles")
-	var ticksSnapshot uint
-	flag.UintVar(&ticksSnapshot, "f", 1,"ticks for each snapshot image.")
-	flag.UintVar(&ticksSnapshot, "frameTicks", 1,"ticks for each snapshot image.")
-	var logInterval time.Duration
-	flag.DurationVar(&logInterval, "interval", time.Second, "time between log status reports")
-	var help bool
-	flag.BoolVar(&help, "help", false, "display help/usage.")
-	flag.BoolVar(&help, "h", false, "display help/usage.")
 	var source fsflags.FileValue
 	flag.Var(&source, "i", "source for the starting cell pattern, encoded in PNG image.(default:<Stdin>)")
 	flag.Var(&source, "input", "source for the starting cell pattern, encoded in PNG image.(default:<Stdin>)")
 	var sink fsflags.CreateFileValue
 	flag.Var(&sink, "o", "file for encoding result cell pattern, PNG image.(default:Stdout)")
 	flag.Var(&sink, "output", "file for encoding result cell pattern, PNG image.(default:Stdout)")
+	var cycles uint
+	flag.UintVar(&cycles, "ticks", 1, "Ticks/Cycles")
+	var logInterval time.Duration
+	flag.DurationVar(&logInterval, "interval", time.Second, "time between log status reports")
+	var wrap bool
+	flag.BoolVar(&wrap, "w", false, "sets arena to (s)ize.")
+	flag.BoolVar(&wrap, "wrap", false, "sets arena to (s)ize.")
 	var movie fsflags.NewOverwriteDirValue
-	flag.Var(&movie, "m", "directory for intermittent result cell pattern, PNG images.")
-	flag.Var(&movie, "movie", "directory for intermittent result cell pattern, PNG images.")
+	flag.Var(&movie, "m", "directory for snapshot frames, PNG images.")
+	flag.Var(&movie, "movie", "directory for snapshot frames, PNG images.")
+	var size uint
+	flag.UintVar(&size, "s", 32,"size of snapshots.")
+	flag.UintVar(&size, "size",32,"size of snapshots.")
+	limit=int(size/2)
+	var ticksSnapshot uint
+	flag.UintVar(&ticksSnapshot, "f", 1,"ticks for each snapshot image.")
+	flag.UintVar(&ticksSnapshot, "frameTicks", 1,"ticks for each snapshot image.")
+	var help bool
+	flag.BoolVar(&help, "help", false, "display help/usage.")
+	flag.BoolVar(&help, "h", false, "display help/usage.")
 	flag.Parse()
 	if help {
 		flag.PrintDefaults()
@@ -97,11 +102,19 @@ func main() {
 	doLog.Stop()
 	if sink.File == nil {
 		log.Printf("Saving:<<StdOut>>")
-		EncodeCellsAsImage(os.Stdout, liveCells)
+		if wrap {
+			EncodeCellsAsSizedImage(os.Stdout, liveCells,size)				
+		}else{
+			EncodeCellsAsImage(os.Stdout, liveCells)
+		}
 		
 	} else {
 		log.Printf("Saving:%q", &sink)
-		EncodeCellsAsImage(&sink, liveCells)
+		if wrap {
+			EncodeCellsAsSizedImage(&sink, liveCells,size)				
+		}else{
+			EncodeCellsAsImage(&sink, liveCells)
+		}
 	}
 }
 
@@ -133,9 +146,9 @@ func tick() (activity bool) {
 func atOffset(l loc, dx, dy int8) surroundingLiveCellCounter {
 	l.x += int(dx)
 	l.y += int(dy)
-	if size>0 {
-		l.x %=size
-		l.y %=size
+	if wrap {
+		l.x %=limit
+		l.y %=limit
 	}
 	if _, in := liveCells[l]; in {
 		return 1
