@@ -35,6 +35,9 @@ func main() {
 	var wrap bool
 	flag.BoolVar(&wrap, "w", false, "sets arena to (s)ize.")
 	flag.BoolVar(&wrap, "wrap", false, "sets arena to (s)ize.")
+	var pipeMovie bool
+	flag.BoolVar(&pipeMovie, "p", false,"send snapshot images to Stdout.")
+	flag.BoolVar(&pipeMovie, "pipeMovie",false, "send snapshot images to Stdout.")
 	var movie fsflags.NewOverwriteDirValue
 	flag.Var(&movie, "m", "directory for snapshot frames, PNG images.")
 	flag.Var(&movie, "movie", "directory for snapshot frames, PNG images.")
@@ -48,10 +51,20 @@ func main() {
 	var help bool
 	flag.BoolVar(&help, "help", false, "display help/usage.")
 	flag.BoolVar(&help, "h", false, "display help/usage.")
+	var logToo fsflags.CreateFileValue
+	flag.Var(&logToo, "log", "progress log destination.(default:Stderr)")
 	flag.Parse()
 	if help {
 		flag.PrintDefaults()
 		os.Exit(0)
+	}
+
+	if pipeMovie {
+		movie.File=os.Stdout
+	}
+
+	if logToo.File == nil {
+		logToo.File = os.Stderr
 	}
 
 	var c uint
@@ -61,6 +74,8 @@ func main() {
 			log.Printf("\t#%d\talive:%d", c, len(liveCells))
 		}
 	}()
+
+
 
 	if source.File == nil {
 		var err error
@@ -78,20 +93,46 @@ func main() {
 			panic(err)
 		}
 	}
+
+	if movie.File!=nil {
+		log.Printf("Saving snapshot images to :%q", &movie)
+	}
+
+
 	log.Printf("\t#%d\talive:%d", 0, len(liveCells))
 
-	for c = 0; c < cycles; c++ {
-		if anyChanged:=tick(); !anyChanged {
-			log.Print("Unchanging")
-			break
+
+	switch movie.File{
+	case nil:
+		for c = 0; c < cycles; c++ {
+			if anyChanged:=tick(); !anyChanged {
+				log.Print("Unchanging")
+				break
+			}
 		}
-		if movie.File!=nil{
+	case os.Stdout:
+		for c = 0; c < cycles; c++ {
+			if anyChanged:=tick(); !anyChanged {
+				log.Print("Unchanging")
+				break
+			}
+			if c%ticksSnapshot ==0 {
+				EncodeCellsAsSizedImage(os.Stdout, liveCells,size)							
+			}
+		}
+	default:
+		for c = 0; c < cycles; c++ {
+			if anyChanged:=tick(); !anyChanged {
+				log.Print("Unchanging")
+				break
+			}
 			if c%ticksSnapshot ==0 {
 				frameFile,err:=os.Create(filepath.Join(movie.File.Name(),strconv.FormatUint(uint64(c),10)+".png"))
 				if err!=nil{
 					log.Printf("\t#%d\tUnable to save frame:%s", c,err)
 				}else{
-					EncodeCellsAsSizedImage(frameFile, liveCells,size)				
+					EncodeCellsAsSizedImage(frameFile, liveCells,size)		
+					frameFile.Close()		
 				}
 			}
 		}
@@ -117,6 +158,9 @@ func main() {
 		}
 	}
 }
+
+
+
 
 func tick() (activity bool) {
 	deadCellsNextToLiveCell = make(map[loc]surroundingLiveCellCounter)
