@@ -81,7 +81,7 @@ func main() {
 	log.Printf("\t#%d\talive:%d", 0, len(liveCells))
 
 	for c = 0; c < cycles; c++ {
-		if !tick() {
+		if anyChanged:=tick(); !anyChanged {
 			log.Print("Unchanging")
 			break
 		}

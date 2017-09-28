@@ -3,7 +3,6 @@ package main
 import (
 	"image"
 	"image/color"
-	"image/color/palette"
 	"image/png"
 	"io"
 	)
@@ -40,11 +39,11 @@ func SetCells(i image.Image,ib image.Rectangle,cells *map[loc]surroundingLiveCel
 
 
 func EncodeCellsAsImage(w io.Writer,c map[loc]surroundingLiveCellCounter) error{
-	return png.Encode(w, RGBAImage{Depiction{c, CellsBounds(c),liveColor, emptyColor}}) 
+	return png.Encode(w, Image{c, CellsBounds(c),liveColor, emptyColor,color.RGBAModel}) 
 }
 
 func EncodeCellsAsSizedImage(w io.Writer,c map[loc]surroundingLiveCellCounter,size uint) error{
-	return png.Encode(w, RGBAImage{Depiction{c, image.Rect(-int(size/2),-int(size/2),int(size/2),int(size/2)),liveColor, emptyColor}}) 
+	return png.Encode(w, Image{c, image.Rect(-int(size/2),-int(size/2),int(size/2),int(size/2)),liveColor, emptyColor,color.RGBAModel}) 
 }
 
 func CellsBounds(c map[loc]surroundingLiveCellCounter)image.Rectangle{
@@ -59,57 +58,26 @@ func CellsBounds(c map[loc]surroundingLiveCellCounter)image.Rectangle{
 }
 
 
-type Depiction struct {
+type Image struct {
 	Cells map[loc]surroundingLiveCellCounter
 	size  image.Rectangle
 	in,out color.Color
+	colorModel color.Model
 }
 
-func (i Depiction) Bounds() image.Rectangle {
+func (i Image) Bounds() image.Rectangle {
 	return i.size
 }
 
-func (i Depiction) At(xp, yp int) color.Color {
+func (i Image) At(xp, yp int) color.Color {
 	if _,in:=i.Cells[loc{xp,yp}];in{
 		return i.in
 	}
 	return i.out
 }
 
-// a Depictor is an image.Image without a colormodel, so is more general.
-// by being embedded in one of the helper wrappers you get an image.Image.
-type Depictor interface {
-	Bounds() image.Rectangle
-	At(x, y int) color.Color
+
+func (i Image) ColorModel() color.Model { 
+	return i.colorModel
 }
-
-// RGBA depiction wrapper
-type RGBAImage struct {
-	Depictor
-}
-
-func (i RGBAImage) ColorModel() color.Model { return color.RGBAModel }
-
-// gray depiction wrapper.
-type GrayImage struct {
-	Depictor
-}
-
-func (i GrayImage) ColorModel() color.Model { return color.GrayModel }
-
-// plan9 paletted, depiction wrapper.
-type Plan9PalettedImage struct {
-	Depictor
-}
-
-func (i Plan9PalettedImage) ColorModel() color.Model { return color.Palette(palette.Plan9) }
-
-// WebSafe paletted, depiction wrapper.
-type WebSafePalettedImage struct {
-	Depictor
-}
-
-func (i WebSafePalettedImage) ColorModel() color.Model { return color.Palette(palette.WebSafe) }
-
-
 
