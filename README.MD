@@ -14,7 +14,7 @@ might be useful for generating explanatory images of certain arrangements/evolut
 
 # converting images to video;
 
-from snapshots already saved in a directory ( -movie=<dir> )
+from snapshots already saved in a directory ( -movie=\<dir> )
 
 	 avconv -i <dir>/%d.png -r 25 output.mp4
 
