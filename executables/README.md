@@ -24,7 +24,7 @@ set 'movie' to a folder, and 'wrap' to something and get snapshot images saved e
 
 Usage
 ```
-  -f uint
+   -f uint
     	ticks for each snapshot image. (default 1)
   -frameTicks uint
     	ticks for each snapshot image. (default 1)
@@ -37,6 +37,8 @@ Usage
     	source for the starting cell pattern, encoded in PNG image.(default:<Stdin>)
   -interval duration
     	time between log status reports (default 1s)
+  -log value
+    	progress log destination.(default:Stderr)
   -m value
     	directory for snapshot frames, PNG images.
   -movie value
@@ -45,6 +47,9 @@ Usage
     	file for encoding result cell pattern, PNG image.(default:Stdout)
   -output value
     	file for encoding result cell pattern, PNG image.(default:Stdout)
+  -p	send snapshot images to Stdout.
+  -pipeMovie
+    	send snapshot images to Stdout.
   -s uint
     	size of snapshots. (default 32)
   -size uint
