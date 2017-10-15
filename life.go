@@ -1,3 +1,11 @@
+/*Conway's Game Of Life
+
+Uses maps/dicts for storage, so basically has an unlimited grid, with speed varying as number of live cells.
+
+in/out storage using png files.
+
+save sequences of images for making movies. 
+*/
 package main
 
 import (
