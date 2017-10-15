@@ -191,8 +191,12 @@ func atOffset(l loc, dx, dy int8) surroundingLiveCellCounter {
 	l.x += int(dx)
 	l.y += int(dy)
 	if wrap {
+		l.x+=limit
+		l.y+=limit
 		l.x %=limit
 		l.y %=limit
+		l.x-=limit
+		l.y-=limit
 	}
 	if _, in := liveCells[l]; in {
 		return 1
