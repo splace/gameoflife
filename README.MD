@@ -8,26 +8,20 @@ in/out storage using png files.
 
 very large grids, easily possible with the 'sparse' internal state storage, are very slow to save.
 
-save sequences of images for making movies. 
+can save sequences of images for making movies. (might be useful for generating explanatory images of certain arrangements/evolutions.)
 
-might be useful for generating explanatory images of certain arrangements/evolutions.
+# making video
 
-# converting images to video;
-
-from snapshots already saved in a directory ( -movie=\<dir> )
+from snapshots already saved in a directory; (made using option; -movie=\<dir>)
 
 	 avconv -i <dir>/%d.png -r 25 output.mp4
 
-or (needs "ls -v" to order files in numeric not alpha order.) 
+alternatively; (requires using "ls -v" so images are sequenced in numeric not alpha order.) 
 
 	ls -v <dir>/* | xargs cat | avconv -i pipe:0 -r 25  output.mp4
 
-		## nice to have options on avconv: -pix_fmt yuv420p -loglevel warning
+	## some other nice to have options on avconv: -pix_fmt yuv420p -loglevel warning
 
-for directly piped snapshots ( uses -o to stop final image going to stdout ) 
+and to create directly from piped snapshots; (uses -o to stop final image going to stdout.) 
 
 	./life -i="glider" -pipeMovie -wrap -size=200 -ticks=500 -o=out | avconv -i pipe:0 -r 25 output.mp4
-
-
-
-
