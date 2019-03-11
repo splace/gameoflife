@@ -1,11 +1,14 @@
 /*Conway's Game Of Life
 
-Uses maps/dicts for storage, so basically has an unlimited grid, with speed varying as number of live cells.
+Uses maps/dicts for storage, so speed/memory use proportional to number of live cells.
 
 in/out storage using png files.
 
 save sequences of images for making movies. 
 */
+
+// TODO add terminal gocli display?
+
 package main
 
 import (
@@ -32,33 +35,33 @@ var wrap bool
 func main() {
 	var source fsflags.FileValue
 	flag.Var(&source, "i", "source for the starting cell pattern, encoded in PNG image.(default:<Stdin>)")
-	flag.Var(&source, "input", "source for the starting cell pattern, encoded in PNG image.(default:<Stdin>)")
+	flag.Var(&source, "input", flag.Lookup("i").Usage)
 	var sink fsflags.CreateFileValue
 	flag.Var(&sink, "o", "file for encoding result cell pattern, PNG image.(default:Stdout)")
-	flag.Var(&sink, "output", "file for encoding result cell pattern, PNG image.(default:Stdout)")
+	flag.Var(&sink, "output", flag.Lookup("o").Usage)
 	var cycles uint
 	flag.UintVar(&cycles, "ticks", 1, "Ticks/Cycles")
 	var logInterval time.Duration
 	flag.DurationVar(&logInterval, "interval", time.Second, "time between log status reports")
 	var wrap bool
 	flag.BoolVar(&wrap, "w", false, "sets arena to (s)ize.")
-	flag.BoolVar(&wrap, "wrap", false, "sets arena to (s)ize.")
+	flag.BoolVar(&wrap, "wrap", false, flag.Lookup("w").Usage)
 	var pipeMovie bool
 	flag.BoolVar(&pipeMovie, "p", false,"send snapshot images to Stdout.")
-	flag.BoolVar(&pipeMovie, "pipeMovie",false, "send snapshot images to Stdout.")
+	flag.BoolVar(&pipeMovie, "pipeMovie",false, flag.Lookup("p").Usage)
 	var movie fsflags.NewOverwriteDirValue
 	flag.Var(&movie, "m", "directory for snapshot frames, PNG images.")
-	flag.Var(&movie, "movie", "directory for snapshot frames, PNG images.")
+	flag.Var(&movie, "movie", flag.Lookup("m").Usage)
 	var size uint
 	flag.UintVar(&size, "s", 32,"size of snapshots.")
 	flag.UintVar(&size, "size",32,"size of snapshots.")
 	limit=int(size/2)
 	var ticksSnapshot uint
 	flag.UintVar(&ticksSnapshot, "f", 1,"ticks for each snapshot image.")
-	flag.UintVar(&ticksSnapshot, "frameTicks", 1,"ticks for each snapshot image.")
+	flag.UintVar(&ticksSnapshot, "frameTicks", 1,flag.Lookup("f").Usage)
 	var help bool
 	flag.BoolVar(&help, "help", false, "display help/usage.")
-	flag.BoolVar(&help, "h", false, "display help/usage.")
+	flag.BoolVar(&help, "h", false, flag.Lookup("h").Usage)
 	var logToo fsflags.CreateFileValue
 	flag.Var(&logToo, "log", "progress log destination.(default:Stderr)")
 	flag.Parse()
