@@ -14,14 +14,14 @@ can save sequences of images for making movies. (might be useful for generating 
 
 from snapshots already saved in a directory; (made using option; -movie=\<dir>)
 
-	 avconv -i <dir>/%d.png -r 25 output.mp4
+	 ffmpeg -i <dir>/%d.png -r 25 output.mp4
 
 alternatively; (requires using "ls -v" so images are sequenced in numeric not alpha order.) 
 
-	ls -v <dir>/* | xargs cat | avconv -i pipe:0 -r 25  output.mp4
+	ls -v <dir>/* | xargs cat | ffmpeg -i pipe:0 -r 25  output.mp4
 
-	## some other nice to have options on avconv: -pix_fmt yuv420p -loglevel warning
+	## some other nice to have options on ffmpeg: -pix_fmt yuv420p -loglevel warning
 
 and to create directly from piped snapshots; (uses -o to stop final image going to stdout.) 
 
-	./life -i="glider" -pipeMovie -wrap -size=200 -ticks=500 -o=out | avconv -i pipe:0 -r 25 output.mp4
+	./life -i="glider" -pipeMovie -wrap -size=200 -ticks=500 -o=out | ffmpeg -i pipe:0 -r 25 output.mp4

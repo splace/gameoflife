@@ -7,6 +7,9 @@ in/out storage using png files.
 save sequences of images for making movies. 
 */
 
+// example arguments:  -i="./media/glider" -pipeMovie -wrap -size=200 -ticks=500
+
+
 // TODO add terminal gocli display?
 
 package main
@@ -54,14 +57,14 @@ func main() {
 	flag.Var(&movie, "movie", flag.Lookup("m").Usage)
 	var size uint
 	flag.UintVar(&size, "s", 32,"size of snapshots.")
-	flag.UintVar(&size, "size",32,"size of snapshots.")
+	flag.UintVar(&size, "size",32,flag.Lookup("s").Usage)
 	limit=int(size/2)
 	var ticksSnapshot uint
 	flag.UintVar(&ticksSnapshot, "f", 1,"ticks for each snapshot image.")
 	flag.UintVar(&ticksSnapshot, "frameTicks", 1,flag.Lookup("f").Usage)
 	var help bool
-	flag.BoolVar(&help, "help", false, "display help/usage.")
-	flag.BoolVar(&help, "h", false, flag.Lookup("h").Usage)
+	flag.BoolVar(&help, "h", false, "display help/usage.")
+	flag.BoolVar(&help, "help", false, flag.Lookup("h").Usage)
 	var logToo fsflags.CreateFileValue
 	flag.Var(&logToo, "log", "progress log destination.(default:Stderr)")
 	flag.Parse()
