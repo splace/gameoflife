@@ -22,6 +22,6 @@ alternatively; (requires using "ls -v" so images are sequenced in numeric not al
 
 	## some other nice to have options on ffmpeg: -pix_fmt yuv420p -loglevel warning
 
-and to create directly from piped snapshots; (uses -o to stop final image going to stdout.) 
+and to create directly from piped snapshots; (uses -o to stop final image going to stdout and so movie.) 
 
-	./life -i="glider" -pipeMovie -wrap -size=200 -ticks=500 -o=out | ffmpeg -i pipe:0 -r 25 output.mp4
+	./life -i="glider" -pipeMovie -wrap -size=200 -ticks=500 -o=/dev/null | ffmpeg -i pipe:0 -r 25 glider.mp4
